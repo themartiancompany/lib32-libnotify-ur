@@ -28,10 +28,29 @@
 # Contributor: TryA <tryagainprod at gmail dot com>
 # Contributor: Jan de Groot <jgc at archlinux dot org>
 
+_os="$( \
+  uname \
+    -o)"
 _ml="lib32-"
+if [[ "${_os}" == "GNU/Linux" ]]; then
+  _compiler_libs='gcc-multilib'
+  _libc="${_ml}glibc"
+if [[ "${_os}" == "GNU/Linux" ]]; then
+  _compiler_libs="libcompiler-rt"
+  _libc="ndk-sysroot"
+fi
+
 _proj="gnome"
+_docs="false"
 _pkg=libnotify
-pkgname="${_ml}${_pkg}"
+pkgname=(
+  "${_ml}${_pkg}"
+)
+if [[ "${_docs}" == "true" ]]; then
+  pkgname+=(
+    "${_ml}${_pkg}-docs"
+  )
+fi
 pkgver=0.8.4
 _commit="570982f616838abba6bdd8ca2bdb2f32f3b1d1de"
 pkgrel=1
@@ -46,19 +65,33 @@ license=(
   'LGPL'
 )
 depends=(
-  "${_pkg}"
+  "${_compiler_libs}"
   "${_ml}gdk-pixbuf2"
+  "${_ml}glib2"
+  "${_libc}"
+  "${_pkg}"
 )
 makedepends=(
   'docbook-xsl'
-  'gcc-multilib'
-  'git'
-  'gtk-doc'
+  # glib2 will become
+  # glib2-devel if arch upstream
+  # at some point wont
+  # deprecate it entirely
+  # before that happens
+  "${_ml}glib2"
   "${_ml}gobject-introspection"
   "${_ml}gtk3"
   'meson'
   'xmlto'
 )
+if [[ "${_docs}" == "true" ]]; then
+  "gi-docgen"
+fi
+if [[ "${_git}" == "true" ]]; then
+  makedepends+=(
+    "git"
+  )
+fi
 _tag_name="commit"
 _tag="${_commit}"
 source=(
@@ -114,14 +147,27 @@ check() {
       --print-errorlogs
 }
 
-package() {
+package_lib32-libnotify() {
   meson \
     install \
     -C \
       "build" \
     --destdir \
       "${pkgdir}"
+  mkdir \
+    -p \
+    "doc/usr/share"
+  mv \
+    {"${pkgdir}","doc"}"/usr/share/doc"
   rm \
     -rf \
     "${pkgdir}/usr/"{"bin","include","share"}
+}
+
+package_lib32-libnotify-docs() {
+  pkgdesc+=" (documentation)"
+  depends=()
+  mv \
+    "doc/"* \
+    "${pkgdir}"
 }
