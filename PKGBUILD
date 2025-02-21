@@ -32,8 +32,8 @@ _ml="lib32-"
 _proj="gnome"
 _pkg=libnotify
 pkgname="${_ml}${_pkg}"
-pkgver=0.8.1
-_commit="650f2f123e75469b85d81fbca66e17b744a7714b"
+pkgver=0.8.4
+_commit="570982f616838abba6bdd8ca2bdb2f32f3b1d1de"
 pkgrel=1
 pkgdesc="Library for sending desktop notifications (32-bit)"
 arch=(
@@ -79,7 +79,17 @@ pkgver() {
 }
 
 build() {
-  # Modify environment to generate 32-bit ELF. Respects flags defined in makepkg.conf
+  local \
+    _meson_opts=()
+  _meson_opts+=(
+    --prefix="/usr"
+    --sbindir="bin"
+    --buildtype="plain"
+    --libexecdir="lib32"
+    --libdir="/usr/lib32"
+  )
+  # Modify environment to generate
+  # 32-bit ELF. Respects flags defined in makepkg.conf
   export \
     CFLAGS="-m32 ${CFLAGS}" \
     CXXFLAGS="-m32 ${CXXFLAGS}" \
@@ -88,7 +98,8 @@ build() {
 #  export PKG_CONFIG_LIBDIR='/usr/lib32/pkgconfig'
   arch-meson \
     "${_pkg}" \
-      build
+    "build" \
+    "${_meson_opts[@]}"
   meson \
     compile \
       -C \
