@@ -35,7 +35,7 @@ _ml="lib32-"
 if [[ "${_os}" == "GNU/Linux" ]]; then
   _compiler_libs='gcc-multilib'
   _libc="${_ml}glibc"
-if [[ "${_os}" == "GNU/Linux" ]]; then
+elif [[ "${_os}" == "GNU/Linux" ]]; then
   _compiler_libs="libcompiler-rt"
   _libc="ndk-sysroot"
 fi
