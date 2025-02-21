@@ -47,15 +47,15 @@ license=(
 )
 depends=(
   "${_pkg}"
-  "${_ml}-gdk-pixbuf2"
+  "${_ml}gdk-pixbuf2"
 )
 makedepends=(
   'docbook-xsl'
   'gcc-multilib'
   'git'
   'gtk-doc'
-  "${_ml}-gobject-introspection"
-  "${_ml}-gtk3"
+  "${_ml}gobject-introspection"
+  "${_ml}gtk3"
   'meson'
   'xmlto'
 )
